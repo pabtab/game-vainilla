@@ -31,28 +31,28 @@
       .right {
         float: left;
       }
-      .celeste {
+      .blue {
         background: #22a6b3;
       }
-      .celeste.light {
+      .blue.light {
         background: #7ed6df;
       }
-      .violeta {
+      .purple {
         background: #be2edd;
       }
-      .violeta.light {
+      .purple.light {
         background: #e056fd;
       }
-      .naranja {
+      .orange {
         background: #f0932b;
       }
-      .naranja.light {
+      .orange.light {
         background: #ffbe76;
       }
-      .verde {
+      .green {
         background: #6ab04c;
       }
-      .verde.light {
+      .green.light {
         background: #badc58;
       }
       .btn-start {
@@ -72,13 +72,149 @@
   </head>
   <body>
     <div class="gameboard">
-      <div id="celeste" class="color celeste left" data-color="celeste"></div>
-      <div id="violeta" class="color violeta right" data-color="violeta"></div>
-      <div id="naranja" class="color naranja left" data-color="naranja"></div>
-      <div id="verde" class="color verde right" data-color="verde"></div>
-      <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+      <div id="blue" class="color blue left" data-color="blue"></div>
+      <div id="purple" class="color purple right" data-color="purple"></div>
+      <div id="orange" class="color orange left" data-color="orange"></div>
+      <div id="green" class="color green right" data-color="green"></div>
+      <button id="btnStart" class="btn-start" onclick="startGame()">Start to play!</button>
     </div>
     <script>
+      const blue = document.getElementById('blue')
+      const purple = document.getElementById('purple')
+      const orange = document.getElementById('orange')
+      const green = document.getElementById('green')
+
+      const btnStart = document.getElementById('btnStart')
+      const LAST_LEVEL = 10
+
+      class Game {
+        constructor() {
+          this.initilize()
+          this.generateSecuence()
+          
+          setTimeout(this.nextLevel, 500);
+        }
+
+        initilize() {
+          this.nextLevel.bind(this)
+          btnStart.classList.add('hide')
+          this.level = 1
+          this.colors = {
+            blue,
+            purple,
+            orange,
+            green,
+          }
+        }
+
+        generateSecuence() {
+          this.secuence = new Array(LAST_LEVEL).fill(0).map(n => Math.floor(Math.random() * 4))
+        }
+
+        nextLevel() {
+          this.sublevel = 0
+          this.iluminateSecuence()
+          this.addEventClick()
+        }
+
+        deleteCLickEvents() {
+          this.colors.blue.removeEventListener('click', this.selectColor)
+          this.colors.purple.removeEventListener('click', this.selectColor)
+          this.colors.orange.removeEventListener('click', this.selectColor)
+          this.colors.green.removeEventListener('click', this.selectColor)
+        }
+
+        addEventClick() {
+          this.colors.blue.addEventListener('click', this.selectColor)
+          this.colors.purple.addEventListener('click', this.selectColor)
+          this.colors.orange.addEventListener('click', this.selectColor)
+          this.colors.green.addEventListener('click', this.selectColor)
+        }
+
+        selectColor = (ev) => {
+          console.log(ev)
+          const colorName = ev.target.dataset.color
+          const colorNum = this.transformColorToNum(colorName)
+          this.iluminateColor(colorName)
+
+          if (colorNum === this.secuence[this.sublevel]) {
+            this.sublevel++
+            if (this.sublevel === this.level)  {
+              this.level++
+              this.deleteCLickEvents()
+              if (this.level === (LAST_LEVEL +1)) {
+                //win
+              } else {
+                setTimeout(this.nextLevel, 1500);
+              }
+
+            }
+          }
+        }
+
+        transformNumToColor(num) {
+          switch (num) {
+            case 0:
+              return 'blue'
+            
+            case 1:
+              return 'purple'
+
+            case 2:
+              return 'orange'
+
+            case 3:
+              return 'green'
+          
+            default:
+              break;
+          }
+        }
+
+        transformColorToNum(num) {
+          switch (num) {
+            case 'blue':
+              return 0
+            
+            case 'purple':
+              return 1
+
+            case 'orange':
+              return 2
+
+            case 'green':
+              return 3
+          
+            default:
+              break;
+          }
+        }
+
+        iluminateColor(color) {
+          this.colors[color].classList.add('light')
+          setTimeout(() => {
+            this.turnoffColor(color)
+          }, 350);
+        }
+
+        turnoffColor(color) {
+          this.colors[color].classList.remove('light')
+        }
+
+        iluminateSecuence() {
+          for (let index = 0; index < this.level; index++) {
+            const color = this.transformNumToColor(this.secuence[index])
+            setTimeout(() => {
+              console.log(color)
+              this.iluminateColor(color)
+            }, 1000 * index);
+          }
+        }
+      }
+
+      function startGame() {
+        window.game = new Game();
+      }
     </script>
   </body>
 </html>
